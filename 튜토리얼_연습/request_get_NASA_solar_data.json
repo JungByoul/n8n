@@ -1,0 +1,220 @@
+{
+  "name": "My workflow 57",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c90c26ff-4bb8-4111-8cf5-c9d4bc1a0376",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "resource": "donkiSolarFlare",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.nasa",
+      "typeVersion": 1,
+      "position": [
+        220,
+        0
+      ],
+      "id": "fa976254-5781-415e-a916-f10635eab5d9",
+      "name": "NASA",
+      "credentials": {
+        "nasaApi": {
+          "id": "5jV327yflxRbTmYF",
+          "name": "NASA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ec48d4d6-1664-4c44-8db7-c8ac5a518b85",
+              "leftValue": "={{ $json.classType }}",
+              "rightValue": "X",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        440,
+        0
+      ],
+      "id": "982362f6-5573-40c2-a193-489259827450",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "resource": "request",
+        "operation": "send",
+        "binId": "1738379271842-8939229114912",
+        "binContent": "=There was a solar flare of class {{ $json.classType }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.postBin",
+      "typeVersion": 1,
+      "position": [
+        660,
+        -100
+      ],
+      "id": "a30b776a-c307-4573-948b-e3e0935e7c57",
+      "name": "PostBin"
+    },
+    {
+      "parameters": {
+        "resource": "request",
+        "operation": "send",
+        "binId": "1738379271842-8939229114912",
+        "binContent": "=There was a solar flare of class {{ $json.classType }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.postBin",
+      "typeVersion": 1,
+      "position": [
+        660,
+        40
+      ],
+      "id": "f30c628a-c52f-44a1-a879-e8cc5268915f",
+      "name": "PostBin1"
+    },
+    {
+      "parameters": {
+        "resource": "request",
+        "binId": "1738379271842-8939229114912",
+        "requestId": "={{ $json.requestId }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.postBin",
+      "typeVersion": 1,
+      "position": [
+        880,
+        -100
+      ],
+      "id": "63aae2b8-2fba-4f65-9390-f861d98d50ce",
+      "name": "PostBin2"
+    },
+    {
+      "parameters": {
+        "resource": "request",
+        "binId": "1738379271842-8939229114912",
+        "requestId": "={{ $json.requestId }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.postBin",
+      "typeVersion": 1,
+      "position": [
+        880,
+        40
+      ],
+      "id": "68eb6d3d-b1f9-4bf5-9c1c-b2bbf05efea3",
+      "name": "PostBin3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "NASA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NASA": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "PostBin",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "PostBin1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PostBin": {
+      "main": [
+        [
+          {
+            "node": "PostBin2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PostBin1": {
+      "main": [
+        [
+          {
+            "node": "PostBin3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "17f404a8-856f-4580-8918-d8caf531c6b4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a8fb7fd31983317952de5fe842ded2643867d47ad03573d086b1bc8ab17aa03b"
+  },
+  "id": "ttuUOefDt6Cm64Kb",
+  "tags": []
+}
