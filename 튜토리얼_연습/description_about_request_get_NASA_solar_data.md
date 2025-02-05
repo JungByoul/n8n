@@ -1,6 +1,9 @@
+#n8n 공식문서 참고함
 https://docs.n8n.io/try-it-out/longer-introduction/
 
-#n8n 공식문서 참고함
+https://datapopcorn.notion.site/NASA-1272a185e5ce80f48ad5f48551ed6a18
+
+
 
 <!-- A slightly longer introduction#
 This guide shows you how to automate a task using a workflow in n8n, explaining key concepts along the way. You will:
