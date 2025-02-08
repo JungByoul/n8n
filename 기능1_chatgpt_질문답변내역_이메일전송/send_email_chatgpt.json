@@ -60,7 +60,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer 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"
+              "value": "$APIkey 입력해야함"
             }
           ]
         },
