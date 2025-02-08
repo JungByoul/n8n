@@ -1,0 +1,210 @@
+{
+  "name": "My workflow 61",
+  "nodes": [
+    {
+      "parameters": {
+        "text": ".",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "Model",
+              "description": "={{ \"gpt-4o\" }}"
+            },
+            {
+              "name": "Response",
+              "description": "={{ $json.choices[0].message.content }} "
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1,
+      "position": [
+        340,
+        0
+      ],
+      "id": "f03a98c7-6130-4e42-9945-6ee7461b3ed6",
+      "name": "Information Extractor1"
+    },
+    {
+      "parameters": {
+        "fromEmail": "jbjb7458@gmail.com",
+        "toEmail": "jb7458@naver.com",
+        "subject": "n8n 챗봇 응답테스트 최종",
+        "emailFormat": "text",
+        "text": "={{ $json.output.Response }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        660,
+        0
+      ],
+      "id": "1c9967f4-df9f-477c-9957-8a0fac9a61aa",
+      "name": "Send Email1",
+      "credentials": {
+        "smtp": {
+          "id": "Rtm397agIvTOAPAN",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gpt-4o-mini\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a helpful assistant. Answer the user's questions concisely.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ $json.prompt }}\"\n    }\n  ],\n  \"temperature\": 0.7\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        520,
+        -200
+      ],
+      "id": "17e3004f-dc63-4370-9f7f-eca6d11a79be",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d2fecc01-63ee-409e-98a5-cd3f7d208968",
+              "name": "prompt",
+              "value": "tell me the main news in Korea",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        340,
+        -200
+      ],
+      "id": "def43998-a1b3-4a9d-92d1-8316648f156f",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        360,
+        160
+      ],
+      "id": "169102b9-8604-4e20-82d4-e10c04263df1",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "rHLwEC1CDLJwzWwE",
+          "name": "OpenAi account 20"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        100,
+        -200
+      ],
+      "id": "f7caf736-b9fe-4f2c-8b1c-6d62dc1ad085",
+      "name": "When clicking ‘Test workflow’"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Information Extractor1": {
+      "main": [
+        [
+          {
+            "node": "Send Email1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "47ef446a-8ff3-4bec-b84f-19dfc4097250",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a8fb7fd31983317952de5fe842ded2643867d47ad03573d086b1bc8ab17aa03b"
+  },
+  "id": "W56UwII1YV8lN9mZ",
+  "tags": []
+}
