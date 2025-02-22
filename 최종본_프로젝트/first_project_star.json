@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "fromEmail": "jbjb7458@gmail.com",
+        "fromEmail": "aaa@gmail.com",
         "toEmail": "={{ $json.output.length > 0 ? $json.output.map(client => client.email).filter(email => email).join(', ') : 'default@example.com' }}\n",
         "subject": "\b관심지역 대규모 분양 알림",
         "emailFormat": "text",
