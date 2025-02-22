@@ -1,0 +1,217 @@
+{
+  "name": "first_project",
+  "nodes": [
+    {
+      "parameters": {
+        "fromEmail": "jbjb7458@gmail.com",
+        "toEmail": "={{ $json.output.length > 0 ? $json.output.map(client => client.email).filter(email => email).join(', ') : 'default@example.com' }}\n",
+        "subject": "\b관심지역 대규모 분양 알림",
+        "emailFormat": "text",
+        "text": "={{ $json.output.map(client => `${client.name}고객님`).join(\"\\n\") }}\n\n팝콘 부동산입니다.  \n인근지역 대규모 분양으로 매물이 급증하고 있으니 편하신 시간에 문의주시면 감사하겠습니다.  \n\n☎ 02-1111-1111  ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        220,
+        400
+      ],
+      "id": "1c9967f4-df9f-477c-9957-8a0fac9a61aa",
+      "name": "Send Email1",
+      "webhookId": "2f188a0a-3b5a-46e8-be6b-65798e450db1",
+      "credentials": {
+        "smtp": {
+          "id": "Rtm397agIvTOAPAN",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "=Dataset Structure\nThe dataset is presented below, where each column is extracted separately, but the order of each item remains consistent across columns.\nThis means that the first value in \"name\" corresponds to the first value in \"age\", \"sex\", \"address\", and so on.\n\nName: {{ $('Google Sheets1').all().map(row => row.json.name).join(', ') }}\nAge: {{ $('Google Sheets1').all().map(row => row.json.age).join(', ') }}\nSex: {{ $('Google Sheets1').all().map(row => row.json.sex).join(', ') }}\nAddress: {{ $('Google Sheets1').all().map(row => row.json.address).join(', ') }}\nInterest: {{ $('Google Sheets1').all().map(row => row.json.interest).join(', ') }}\nContract Status: {{ $('Google Sheets1').all().map(row => row.json.contract_status).join(', ') }}\nEmail: {{ $('Google Sheets1').all().map(row => row.json.email).join(', ') }}\nStep 1: Understanding the User Query\nThe user has provided a filtering condition in the following query:\n{{ $('\bPrompting').item.json.prompt }}\nThis query contains specific filtering conditions.\nCarefully analyze this query and extract all requirements:\n\nIdentify the columns to filter (e.g., \"age\", \"sex\").\nIdentify the filtering condition (e.g., \"greater than 30\", \"only males\").\nApply these conditions to the dataset and extract only the matching rows.\n\nStep 2: Reconstruct the Original Data Format\nSince each column is extracted separately, you must reconstruct the dataset by aligning values based on their order:\n\nGroup the corresponding values together by their index order:\n\nThe first value in each column corresponds to the first client.\nThe second value in each column corresponds to the second client.\nContinue this pattern for all rows.\nConvert the structured dataset into JSON format, where each client is represented as an object:\n\n[\n  {\n    \"name\": \"first client's name\",\n    \"age\": \"first client's age\",\n    \"sex\": \"first client's sex\",\n    \"address\": \"first client's address\",\n    \"interest\": \"first client's interest\",\n    \"contract_status\": \"first client's contract_status\",\n    \"email\": \"first client's email\"\n  },\n  {\n    \"name\": \"second client's name\",\n    \"age\": \"second client's age\",\n    \"sex\": \"second client's sex\",\n    \"address\": \"second client's address\",\n    \"interest\": \"second client's interest\",\n    \"contract_status\": \"second client's contract_status\",\n    \"email\": \"second client's email\"\n  }\n]\n\nStep 3: Apply the Filtering Condition\nGo through each row and check if it satisfies all extracted filtering conditions.\nOnly return the clients who meet all the conditions (e.g., age > 30 and sex == \"male\").\nIf no data matches, return an empty JSON array ([]).\n\nStep 4: Return the Data in the Correct Format\nThe output should maintain the same structure as the dataset above.\nDo not add extra fields or modify existing field names.\nEnsure that all values match the correct data types.\nIf no matching clients exist, return an empty array ([]).\n\nStep 5: Example Queries and Expected Outputs\nExample 1:\nUser Query:\n\n\n\"send email to clients who are greater than 30 and male\"\n✅ Expected AI Output:\n\n[\n  {\n    \"name\": \"김철수\",\n    \"age\": \"35\",\n    \"sex\": \"남\",\n    \"address\": \"서울\",\n    \"interest\": \"아파트\",\n    \"contract_status\": \"진행중\",\n    \"email\": \"user1@example.com\"\n  },\n  {\n    \"name\": \"박상준\",\n    \"age\": \"50\",\n    \"sex\": \"남\",\n    \"address\": \"대구\",\n    \"interest\": \"오피스텔\",\n    \"contract_status\": \"보류\",\n    \"email\": \"user3@example.com\"\n  },\n  {\n    \"name\": \"류현진\",\n    \"age\": \"42\",\n    \"sex\": \"남\",\n    \"address\": \"전북\",\n    \"interest\": \"아파트\",\n    \"contract_status\": \"완료\",\n    \"email\": \"user30@example.com\"\n  }\n]\n---------\nDataset Structure\nThe dataset is presented below, where each column is extracted separately, but the order of each item remains consistent across columns.\nThis means that the first value in \"name\" corresponds to the first value in \"age\", \"sex\", \"address\", and so on.\n\nName: {{ $('Google Sheets1').all().map(row => row.json.name).join(', ') }}\nAge: {{ $('Google Sheets1').all().map(row => row.json.age).join(', ') }}\nSex: {{ $('Google Sheets1').all().map(row => row.json.sex).join(', ') }}\nAddress: {{ $('Google Sheets1').all().map(row => row.json.address).join(', ') }}\nInterest: {{ $('Google Sheets1').all().map(row => row.json.interest).join(', ') }}\nContract Status: {{ $('Google Sheets1').all().map(row => row.json.contract_status).join(', ') }}\nEmail: {{ $('Google Sheets1').all().map(row => row.json.email).join(', ') }}\nStep 1: Understanding the User Query\nThe user has provided a filtering condition in the following query:\n{{ $('\bPrompting').item.json.prompt }}\n\nThis query contains specific filtering conditions.\nCarefully analyze this query and extract all requirements:\n\nIdentify the columns to filter (e.g., \"age\", \"sex\").\nIdentify the filtering condition (e.g., \"greater than 30\", \"only males\").\nApply these conditions to the dataset and extract only the matching rows.\n\nStep 2: Reconstruct the Original Data Format\nSince each column is extracted separately, you must reconstruct the dataset by aligning values based on their order:\n\nGroup the corresponding values together by their index order:\n\nThe first value in each column corresponds to the first client.\nThe second value in each column corresponds to the second client.\nContinue this pattern for all rows.\nConvert the structured dataset into JSON format, where each client is represented as an object:\n\n[\n  {\n    \"name\": \"first client's name\",\n    \"age\": \"first client's age\",\n    \"sex\": \"first client's sex\",\n    \"address\": \"first client's address\",\n    \"interest\": \"first client's interest\",\n    \"contract_status\": \"first client's contract_status\",\n    \"email\": \"first client's email\"\n  },\n  {\n    \"name\": \"second client's name\",\n    \"age\": \"second client's age\",\n    \"sex\": \"second client's sex\",\n    \"address\": \"second client's address\",\n    \"interest\": \"second client's interest\",\n    \"contract_status\": \"second client's contract_status\",\n    \"email\": \"second client's email\"\n  }\n]\n\nStep 3: Apply the Filtering Condition\nGo through each row and check if it satisfies all extracted filtering conditions.\nOnly return the clients who meet all the conditions (e.g., age > 30 and sex == \"male\").\nIf no data matches, return an empty JSON array ([]).\n\nStep 4: Return the Data in the Correct Format\nThe output should maintain the same structure as the dataset above.\nDo not add extra fields or modify existing field names.\nEnsure that all values match the correct data types.\nIf no matching clients exist, return an empty array ([]).\n\nStep 5: Example Queries and Expected Outputs\nExample 1:\nUser Query:\n\nplaintext\n복사\n편집\n\"send email to clients who are greater than 30 and male\"\n✅ Expected AI Output:\n\n[\n  {\n    \"name\": \"김철수\",\n    \"age\": \"35\",\n    \"sex\": \"남\",\n    \"address\": \"서울\",\n    \"interest\": \"아파트\",\n    \"contract_status\": \"진행중\",\n    \"email\": \"user1@example.com\"\n  },\n  {\n    \"name\": \"박상준\",\n    \"age\": \"50\",\n    \"sex\": \"남\",\n    \"address\": \"대구\",\n    \"interest\": \"오피스텔\",\n    \"contract_status\": \"보류\",\n    \"email\": \"user3@example.com\"\n  },\n  {\n    \"name\": \"류현진\",\n    \"age\": \"42\",\n    \"sex\": \"남\",\n    \"address\": \"전북\",\n    \"interest\": \"아파트\",\n    \"contract_status\": \"완료\",\n    \"email\": \"user30@example.com\"\n  }\n]\n",
+        "schemaType": "fromJson",
+        "jsonSchemaExample": "[{\n\t\"name\": \"손민혁\",\n  \"age\": \"30\",\n  \"sex\": \"남\",\n  \"address\": \"인천\",\n  \"interest\": \"빌라\",\n  \"contract_status\": \"취소\",\n  \"email\": \"user1@example.com\"\n},\n\n{\n\t\"name\": \"김다희\",\n  \"age\": \"36\",\n  \"sex\": \"남\",\n  \"address\": \"충북\",\n  \"interest\": \"단독주택\",\n  \"contract_status\": \"완료\",\n  \"email\": \"user2@example.com\"\n}\n  \n\n]\n\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        400
+      ],
+      "id": "f11ac22e-4900-443a-950c-1c26c5bace84",
+      "name": "Information Extractor"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo-0125",
+          "mode": "list",
+          "cachedResultName": "gpt-3.5-turbo-0125"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -140,
+        560
+      ],
+      "id": "5fb4f7a4-8cdf-4c8b-9d8a-c65f13b88593",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "rHLwEC1CDLJwzWwE",
+          "name": "OpenAi account 20"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -180,
+        200
+      ],
+      "id": "bd3f566b-b9c3-4d3e-98c9-cbf1d5d526c1",
+      "name": "Schedule Trigger1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1AEzS3j1lMy1JYgXrwkTAlNE4S7I7OpkOFF6ETN-P3x0",
+          "mode": "list",
+          "cachedResultName": "부동산_샘플",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AEzS3j1lMy1JYgXrwkTAlNE4S7I7OpkOFF6ETN-P3x0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "시트1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1AEzS3j1lMy1JYgXrwkTAlNE4S7I7OpkOFF6ETN-P3x0/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        180,
+        200
+      ],
+      "id": "7070fa55-fa24-4800-90e5-6b7965212b45",
+      "name": "Google Sheets1",
+      "alwaysOutputData": true,
+      "executeOnce": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EHXul6RXRFhqfjRY",
+          "name": "Google Sheets account 12"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d2fecc01-63ee-409e-98a5-cd3f7d208968",
+              "name": "prompt",
+              "value": "send email to clients whose age is greater than 30 and sex is male",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        200
+      ],
+      "id": "6f7f569a-de5f-4616-8155-54f895f1c6b6",
+      "name": "\bPrompting"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "\bPrompting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Send Email1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "\bPrompting": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5d843933-18e4-476e-a725-c451e37cac1f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a8fb7fd31983317952de5fe842ded2643867d47ad03573d086b1bc8ab17aa03b"
+  },
+  "id": "W56UwII1YV8lN9mZ",
+  "tags": []
+}
