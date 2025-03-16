@@ -1,0 +1,335 @@
+{
+  "name": "workflow_by_March",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "=Happy {{ $today.weekdayLong }}!\nKnowledge source assistant at your service. How can I help you?",
+        "options": {
+          "subtitle": "",
+          "title": "Notion Knowledge Base"
+        }
+      },
+      "id": "22d8e29e-da94-4de7-a123-a257990a2de0",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "position": [
+        1580,
+        940
+      ],
+      "webhookId": "b76d02c0-b406-4d21-b6bf-8ad2c623def3",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {
+          "temperature": 0.7,
+          "timeout": 25000
+        }
+      },
+      "id": "506d8ba3-842c-4e68-ad75-a7008c728f06",
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        2060,
+        1180
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "openAiApi": {
+          "id": "rHLwEC1CDLJwzWwE",
+          "name": "OpenAi account 20"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "=Use this tool to search the \"\" Notion app database.\n\nIt is structured with question and answer format. \nYou can filter query result by:\n- By keyword\n\nKeyword have an OR relationship not AND.\n\n",
+        "method": "POST",
+        "url": "=https://api.notion.com/v1/databases/{{ $json.notionID }}/query",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"filter\": {\n    \"and\": [\n      {\n        \"property\": \"Task name\",\n        \"title\": {\n          \"contains\": \"{keyword}\"\n        }\n      },\n      {\n        \"property\": \"Status\",\n        \"status\": {\n          \"equals\": \"{status}\"\n        }\n      }\n    ]\n  },\n  \"sorts\": [\n    {\n      \"property\": \"Due\",\n      \"direction\": \"ascending\"\n    }\n  ]\n}\n",
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "keyword",
+              "description": "Searches question of the record. Use one keyword at a time."
+            },
+            {
+              "name": "status",
+              "description": "=Options: {{ $('Get database details1').item.json.properties.Status }}"
+            }
+          ]
+        }
+      },
+      "id": "d84b897b-4f4a-4a32-998e-bcdd2b508700",
+      "name": "Search notion database1",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "position": [
+        2360,
+        1180
+      ],
+      "typeVersion": 1.1,
+      "credentials": {
+        "notionApi": {
+          "id": "Iu9Jq7tokD4QQK69",
+          "name": "Notion account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "database",
+        "databaseId": {
+          "__rl": true,
+          "value": "16e671d7-9ff4-8079-a368-dbb010b24928",
+          "mode": "list",
+          "cachedResultName": "단계별 핵심문서",
+          "cachedResultUrl": "https://www.notion.so/16e671d79ff48079a368dbb010b24928"
+        },
+        "simple": false
+      },
+      "id": "63fb7908-3223-434a-810b-05e00fde4e26",
+      "name": "Get database details1",
+      "type": "n8n-nodes-base.notion",
+      "position": [
+        1800,
+        940
+      ],
+      "typeVersion": 2.2,
+      "credentials": {
+        "notionApi": {
+          "id": "Iu9Jq7tokD4QQK69",
+          "name": "Notion account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 4
+      },
+      "id": "f8ce6396-8b53-4d4d-9aa8-77022a5b5433",
+      "name": "Window Buffer Memory1",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        2200,
+        1180
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "toolDescription": "=Use this tool to retrieve Notion page content using the page ID. \n\nIt is structured with question and answer format. \nYou can filter query result by:\n- By keyword\n- filter by tag.\n\nKeyword and Tag have an OR relationship not AND.\n\n",
+        "url": "https://api.notion.com/v1/blocks/{page_id}/children",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "notionApi",
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "page_id",
+              "description": "Notion page id from 'Search notion database' tool results"
+            }
+          ]
+        },
+        "optimizeResponse": true,
+        "dataField": "results",
+        "fieldsToInclude": "selected",
+        "fields": "id, type, paragraph.text, heading_1.text, heading_2.text, heading_3.text, bulleted_list_item.text, numbered_list_item.text, to_do.text, children"
+      },
+      "id": "8fe3ec60-5b75-4e9b-9da1-9ed7d639bd18",
+      "name": "Search inside database record1",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "position": [
+        2520,
+        1180
+      ],
+      "notesInFlow": true,
+      "typeVersion": 1.1,
+      "credentials": {
+        "notionApi": {
+          "id": "Iu9Jq7tokD4QQK69",
+          "name": "Notion account 4"
+        }
+      },
+      "notes": " "
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a8e58791-ba51-46a2-8645-386dd1a0ff6e",
+              "name": "sessionId",
+              "type": "string",
+              "value": "={{ $('When chat message received').item.json.sessionId }}"
+            },
+            {
+              "id": "434209de-39d5-43d8-a964-0fcb7396306c",
+              "name": "action",
+              "type": "string",
+              "value": "={{ $('When chat message received').item.json.action }}"
+            },
+            {
+              "id": "cad4c972-51a9-4e16-a627-b00eea77eb30",
+              "name": "chatInput",
+              "type": "string",
+              "value": "={{ $('When chat message received').item.json.chatInput }}"
+            },
+            {
+              "id": "8e88876c-2714-494d-bd5e-5e80c99f83e3",
+              "name": "notionID",
+              "type": "string",
+              "value": "={{ $('Get database details1').item.json.id }}"
+            },
+            {
+              "id": "a88a15f6-317c-4d2e-9d64-26f5ccaf7a97",
+              "name": "databaseName",
+              "type": "string",
+              "value": "={{ $json.title[0].text.content }}"
+            },
+            {
+              "id": "7c3bf758-8ed3-469a-8695-6777f4af4fb9",
+              "name": "\bStatus",
+              "type": "string",
+              "value": "={{ (() => {\n  const validStatuses = [\"Not started\", \"In progress\", \"Done\", \"Archived\"];\n  const userStatus = \"In progress\"; \n\n  if (!validStatuses.includes(userStatus)) {\n    return `⚠️ The status \"${userStatus}\" is not valid. Please use one of: ${validStatuses.join(', ')}`;\n  }\n\n  return userStatus;\n})() }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3d9a5f02-a9f5-49dc-92cc-efd7def73673",
+      "name": "Format schema1",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2000,
+        940
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "=# Role:\nYou are a helpful agent. Query the \"{{ $json.databaseName }}\" Notion database to find relevant records or summarize insights based on multiple records.\n\n# Behavior:\n\nBe clear, very concise, efficient, and accurate in responses. Do not hallucinate.\nIf the request is ambiguous, ask for clarification. Do not embellish, only use facts from the Notion records. Do not offer general advice.\n\n# Error Handling:\n\nIf no matching records are found, try alternative search criteria. Example 1: Laptop, then Computer, then Equipment. Example 2: meetings, then meeting.\nClearly explain any issues with queries (e.g., missing fields or unsupported filters).\n\n# Output:\n\nReturn concise, user-friendly results or summaries.\nFor large sets, show top results by default and offer more if needed. Output URLs in markdown format. \n\nWhen a record has the answer to user question, always output the URL to that page. Do not output links twice."
+        }
+      },
+      "id": "47c6d649-a244-40eb-be2b-2f391cf3e380",
+      "name": "AI Agent1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        2200,
+        940
+      ],
+      "typeVersion": 1.6
+    },
+    {
+      "parameters": {
+        "content": "## 노션 데이터베이스 전용 챗봇\n**특징** 일단 노션 데이터베이스의 Tast name, Status, Priority 까지는 접근이 되는데 그 해당 하위 문서까지는 접근이 안됨. 그래서 answer  태그 사용하는게 현실적임."
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1560,
+        760
+      ],
+      "typeVersion": 1,
+      "id": "45cb77ac-96e8-4541-850c-06c634fc617b",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Get database details1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search notion database1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get database details1": {
+      "main": [
+        [
+          {
+            "node": "Format schema1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search inside database record1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format schema1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "12860c72-3318-4e0c-9524-54c602001bf7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a8fb7fd31983317952de5fe842ded2643867d47ad03573d086b1bc8ab17aa03b"
+  },
+  "id": "2SchzKq1uXLTeAE1",
+  "tags": []
+}
