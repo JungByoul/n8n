@@ -1,0 +1,463 @@
+{
+  "name": "[별]차트 자동화",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "send-to-looker",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "08948eec-3aea-44c4-8b96-bbd6383f28cd",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -260,
+        -320
+      ],
+      "webhookId": "b9e2a0f8-c193-4cca-b664-738fd1e72ec7"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "data",
+              "value": "={{(() => {\n  const data = $json.body;\n  const names = [\n    { prefix: 'hong', name: '홍길동' },\n    { prefix: 'jun', name: '전우치' },\n    { prefix: 'im', name: '임꺽정' }\n  ];\n\n  return names.map(({ prefix, name }) => ({\n    name,\n    capital: data[`${prefix}_capital`] || '',\n    date: data[`${prefix}_date`] || '',\n    profit: data[`${prefix}_profit`] || '',\n    roi: data[`${prefix}_roi`] || ''\n  }));\n})()}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3d0ddb60-71c2-4745-bfbc-8dbb9f393ee3",
+      "name": "Set Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        -60,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        160,
+        -320
+      ],
+      "id": "6268b1ea-f750-486e-9900-3a0c3f7cd72f",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1DZU2VuzWRki_bd04GtvIAKcup3ZH_1j-rKdcsCrJVCw",
+          "mode": "list",
+          "cachedResultName": "els_template_sample",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DZU2VuzWRki_bd04GtvIAKcup3ZH_1j-rKdcsCrJVCw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 967792872,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DZU2VuzWRki_bd04GtvIAKcup3ZH_1j-rKdcsCrJVCw/edit#gid=967792872"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -60,
+        20
+      ],
+      "id": "7f516bdd-186d-4fe5-8baa-279a7424ca5a",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EHXul6RXRFhqfjRY",
+          "name": "Google Sheets account 12"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "labelsUi": {
+          "labelsValues": [
+            {
+              "label": "={{ $json.chartLabels }}"
+            }
+          ]
+        },
+        "data": "={{ $json.chartDatasets[0].data }}",
+        "output": "chartImage",
+        "chartOptions": {
+          "format": "png"
+        },
+        "datasetOptions": {}
+      },
+      "type": "n8n-nodes-base.quickChart",
+      "typeVersion": 1,
+      "position": [
+        180,
+        20
+      ],
+      "id": "eb848ea6-1309-4a2d-b3b3-947d2054f661",
+      "name": "QuickChart1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst labels = [\"6M\", \"12M\", \"18M\", \"24M\", \"30M\", \"36M\"];\n\nconst datasets = items.map(item => {\n  const row = item.json;\n\n  return {\n    label: `ID ${row.ID}`,\n    data: [\n      Number(row[\"Price @6M\"]),\n      Number(row[\"Price @12M\"]),\n      Number(row[\"Price @18M\"]),\n      Number(row[\"Price @24M\"]),\n      Number(row[\"Price @30M\"]),\n      Number(row[\"Price @36M\"])\n    ],\n    fill: false,\n    tension: 0.1\n  };\n});\n\nreturn [\n  {\n    json: {\n      chartLabels: labels,\n      chartDatasets: datasets\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        60,
+        20
+      ],
+      "id": "fbf7cf61-16d2-4730-963a-119d80112929",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "fromEmail": "jb7458@naver.com",
+        "toEmail": "jb7458@naver.com",
+        "subject": "Chart Image",
+        "emailFormat": "text",
+        "text": "차트 이미지가 첨부되었습니다.",
+        "options": {
+          "attachments": "chartImage"
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        340,
+        20
+      ],
+      "id": "e306d705-57fe-47b0-86d2-2b7b26f95569",
+      "name": "Send Email",
+      "webhookId": "8994fa03-11eb-4938-bd3e-f87e761a8c5c",
+      "credentials": {
+        "smtp": {
+          "id": "Rtm397agIvTOAPAN",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        220,
+        500
+      ],
+      "id": "82a0381f-1188-4514-8e19-ada5dd76718c",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "rHLwEC1CDLJwzWwE",
+          "name": "OpenAi account 20"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=<html>\n  <head>\n    <title>ROI Chart</title>\n    <script src=\"https://cdn.jsdelivr.net/npm/chart.js\"></script>\n  </head>\n  <body>\n    <h2>사용자별 ROI 차트</h2>\n    <canvas id=\"myChart\" width=\"800\" height=\"400\"></canvas>\n    <script>\n      const ctx = document.getElementById('myChart').getContext('2d');\n      const myChart = new Chart(ctx, {\n        type: 'bar',\n        data: {\n          labels: [{{ $items().map(item => `\"${item.json.name}\"`).join(', ') }}],\n          datasets: [{\n            label: 'ROI',\n            data: [{{ $items().map(item => item.json.roi).join(', ') }}],\n            backgroundColor: 'rgba(75, 192, 192, 0.6)',\n            borderColor: 'rgba(75, 192, 192, 1)',\n            borderWidth: 1\n          }]\n        },\n        options: {\n          scales: {\n            y: { beginAtZero: true }\n          }\n        }\n      });\n    </script>\n  </body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        340,
+        -320
+      ],
+      "id": "4aa20f6e-b3df-4868-8b1b-2b3a535d30b0",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "content": "# 차트 자동화 워크플로우\n(made by star)\n## Ver1: 웹을 활용한 인터렉티브 시각화\n\n## Ver2: Google Sheet를 활용한 데이터 시각화",
+        "height": 200,
+        "width": 500,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -140,
+        -760
+      ],
+      "typeVersion": 1,
+      "id": "be196c2b-e495-4bae-bbd6-ac524597f9c8",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# Ver1\n## 웹을 활용한 인터렉티브 시각화",
+        "height": 120,
+        "width": 320,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -620,
+        -480
+      ],
+      "typeVersion": 1,
+      "id": "7fcb0e54-aa72-450f-ba5f-5c0057b94bf3",
+      "name": "Sticky Note1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "# Ver2\n## Google Sheet를 활용한 데이터 시각화",
+        "height": 140,
+        "width": 320,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -620,
+        -120
+      ],
+      "typeVersion": 1,
+      "id": "4ad83fcc-aaa6-4d90-acab-9e7eb04bf71b",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "### [Trigger]\n## 웹의 input form에 입력값을 받음",
+        "height": 300,
+        "width": 200,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -280,
+        -480
+      ],
+      "typeVersion": 1,
+      "id": "5861d611-5500-4f5b-85ee-c80786c3cb4e",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "### [Task]\n## 입력받은 데이터를 전처리\n### *Split out 노드를 통해 각 사람별로 날짜, 수익 등을 다르게 정렬",
+        "height": 300,
+        "width": 320,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -60,
+        -480
+      ],
+      "typeVersion": 1,
+      "id": "7fa843d3-e330-4a58-937d-c0f8ae13237b",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "### [Destination]\n## 웹의 input form 자리에 그대로 데이터를 차트화한 결과 송출",
+        "height": 300,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        300,
+        -480
+      ],
+      "typeVersion": 1,
+      "id": "11b1abc7-e5fa-43a5-a411-3f826f85abda",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "### [Trigger]\n## 매일 자정마다 실행",
+        "height": 320,
+        "width": 180,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -280,
+        -120
+      ],
+      "typeVersion": 1,
+      "id": "8d365312-9384-4ce4-b9f9-ebf2fc01af8b",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "### [Task]\n## Google Sheet의 데이터를 불러들이고(read), 전처리 이후 간단한 시각화 이미지 생성",
+        "height": 320,
+        "width": 380,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -80,
+        -120
+      ],
+      "typeVersion": 1,
+      "id": "dad1a1b7-446e-46ba-a584-b48cae25ec60",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "### [Destination]\n## 미리 지정된 사람들에게 '첨부파일' 형태로 차트 이미지 전송",
+        "height": 320,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        320,
+        -120
+      ],
+      "typeVersion": 1,
+      "id": "8b001a48-d94d-450a-9e84-a1dbabd95bf0",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -260,
+        20
+      ],
+      "id": "f0802ec5-a72a-45a7-b062-5211cdd5fafc",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Data": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "QuickChart1": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "QuickChart1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "main": [
+        []
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "32efb1de-3e0f-4ff0-b5ca-fa5bcb24faba",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a8fb7fd31983317952de5fe842ded2643867d47ad03573d086b1bc8ab17aa03b"
+  },
+  "id": "es5BZX2xisZFwi5c",
+  "tags": [
+    {
+      "createdAt": "2025-04-25T12:00:20.295Z",
+      "updatedAt": "2025-04-25T12:00:20.295Z",
+      "id": "wCS2ZbahRRJxSnUJ",
+      "name": "#스터디4기"
+    }
+  ]
+}
